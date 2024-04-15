@@ -1,16 +1,23 @@
 #!/usr/bin/python3
 
 import requests
-import sys
+from sys import argv, exit
 
-
-def fetch_todo_progress(employee_id):
+if __name__ == "__main__":
     """
     Fetches and displays the progress of an employee's TODO list.
 
-    The function prints the employee's name, the number of completed tasks,
-    and the total number of tasks, followed by the titles of completed tasks.
+    The script accepts an integer as a parameter, which is the employee ID.
+    It displays the employee's TODO list progress in the specified format.
     """
+
+    # Ensure correct usage
+    if len(argv) != 2:
+        print("Usage: python script.py <employee_id>")
+        exit(1)
+
+    # Parse employee ID from command line arguments
+    employee_id = int(argv[1])
 
     # Base URL for the JSONPlaceholder API
     base_url = 'https://jsonplaceholder.typicode.com'
@@ -42,16 +49,3 @@ def fetch_todo_progress(employee_id):
     for task in todo_data:
         if task['completed']:
             print(f"\t{task['title']}")
-
-
-if __name__ == "__main__":
-    # Ensure correct usage
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <employee_id>")
-        sys.exit(1)
-
-    # Parse employee ID from command line arguments
-    employee_id = int(sys.argv[1])
-
-    # Fetch and display TODO list progress
-    fetch_todo_progress(employee_id)
