@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import requests
-from sys import argv, exit
+from sys import argv
 
 if __name__ == "__main__":
     """
