@@ -1,48 +1,44 @@
 #!/usr/bin/python3
-"""
-For a given employee ID, returns information about his/her task list progress
-"""
-
-import json
+"""Retrieves and displays an employee's TODO list progress"""
 import requests
 import sys
 
-# Get the employee id from command line
-employee_id = sys.argv[1]
 
-# Get request to api for employee data
-employee_data = requests.get(
-    'https://jsonplaceholder.typicode.com/users/' + employee_id)
+def get_employee_todos(employee_id):
+    """Retrieves the employee's todos from the API"""
+    url = f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}"
+    response = requests.get(url)
+    todos = response.json()
+    return todos
 
-# Parse data as json
-employee_data_json = employee_data.json()
 
-# Get employee name from key name
-employee_name = employee_data_json['name']
+def display_todo_progress(employee_id):
+    """Displays the employee's TODO list progress"""
+    todos = get_employee_todos(employee_id)
+    employee_name = get_employee_name(employee_id)
+    total_tasks = len(todos)
+    done_tasks = sum(1 for task in todos if task.get("completed"))
+    print(f"Employee {employee_name} is done with tasks"
+          f"({done_tasks}/{total_tasks}):")
+    for task in todos:
+        if task.get("completed"):
+            print(f"\t {task.get('title')}")
 
-# Get request to api for todo data
-todo_data = requests.get(
-    'https://jsonplaceholder.typicode.com/todos?userId=' + employee_id)
 
-# Parse data as json
-todo_data_json = todo_data.json()
+def get_employee_name(employee_id):
+    """Retrieves the employee's name from the API"""
+    url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
+    response = requests.get(url)
+    employee = response.json()
+    return f"{employee.get('name')}"
 
-# Use len to calculate total number of tasks
-total_todos = str(len(todo_data_json))
 
-# Calculate completed tasks
-completed_todos = str(sum(1 for task in todo_data_json if task['completed']))
-
-# Print output with provided format
-print("Employee " + employee_name + " is done with tasks(" +
-      completed_todos + "/" + total_todos + "):")
-
-# List completed tasks titles
-for task in todo_data_json:
-    if task['completed']:
-        print('\t ' + task['title'])
-
-# Check if the script is being run directly as the main program
-if __name__ == '__main__':
-    # Code inside this block will only run if this script is executed directly
-    pass
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python3 0-gather_data_from_an_API.py <employee_id>")
+    else:
+        try:
+            employee_id = int(sys.argv[1])
+            display_todo_progress(employee_id)
+        except ValueError:
+            print("Employee ID must be an integer")
